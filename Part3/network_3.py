@@ -163,13 +163,14 @@ class Router:
     ##@param name: friendly router name for debugging
     # @param intf_count: the number of input and output interfaces 
     # @param max_queue_size: max queue length (passed to Interface)
-    def __init__(self, name, intf_count, max_queue_size):
+    def __init__(self, name, intf_count, max_queue_size, routing_table):
         self.stop = False #for thread termination
         self.name = name
         #create a list of interfaces
         self.in_intf_L = [Interface(max_queue_size) for _ in range(intf_count)]
         self.out_intf_L = [Interface(max_queue_size) for _ in range(intf_count)]
 
+        self.routing_table = routing_table
     ## called when printing the object
     def __str__(self):
         return 'Router_%s' % (self.name)
@@ -190,19 +191,25 @@ class Router:
                         p = NetworkPacket.from_byte_S(pkt_S)
 
                         packets = NetworkPacket.create_fragments(p.dst_addr, p.data_S, mtu)
-                        print('%s: fragmenting packet "%s" from interface %d to %d' % (self, p, i, i))
                         for packet in packets:
-                            self.out_intf_L[i].put(packet, True)
-                        print('%s: sending fragment "%s" from interface %d to %d' % (self, packet, i, i))
+                            self.out_intf_L[self.find_interface(i, NetworkPacket.from_byte_S(packet).dst_addr)].put(packet, True)
                         pass
                     else:
                         p = NetworkPacket.from_byte_S(pkt_S) #parse a packet out
-                        self.out_intf_L[i].put(p.to_byte_S(), True)
+                        self.out_intf_L[self.find_interface(i, p.dst_addr)].put(p.to_byte_S(), True)
                         print('%s: forwarding packet "%s" from interface %d to %d' % (self, p, i, i))
             except queue.Full:
                 print('%s: packet "%s" lost on interface %d' % (self, p, i))
                 pass
-                
+
+    def find_interface(self, source, dest):
+        for tuple in self.routing_table:
+            if(tuple[0] == source and tuple[1] == dest):
+                return tuple[2]
+        print('Couldnt Find Route:')
+        print(source)
+        print(dest)
+        return -1
     ## thread target for the host to keep forwarding data
     def run(self):
         print (threading.currentThread().getName() + ': Starting')
