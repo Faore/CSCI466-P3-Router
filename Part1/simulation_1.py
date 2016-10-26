@@ -3,14 +3,16 @@ Created on Oct 12, 2016
 
 @author: mwitt_000
 '''
-import network_1
-import link_1
 import threading
 from time import sleep
 
+import link_1
+
+from Part1 import network_1
+
 ##configuration parameters
 router_queue_size = 0 #0 means unlimited
-simulation_time = 1 #give the network sufficient time to transfer all packets before quitting
+simulation_time = 5 #give the network sufficient time to transfer all packets before quitting
 
 if __name__ == '__main__':
     object_L = [] #keeps track of objects, so we can kill their threads
@@ -47,8 +49,7 @@ if __name__ == '__main__':
     #create some send events    
     for i in range(3):
         data = 'Hello! This is an amazing packet that happens to be approximately 80 characters.'
-        client.udt_send(2, data[:40])
-        client.udt_send(2, data[40:])
+        client.udt_send(2, data)
     
     
     #give the network sufficient time to transfer all packets before quitting
