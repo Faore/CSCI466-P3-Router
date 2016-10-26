@@ -6,9 +6,9 @@ Created on Oct 12, 2016
 import threading
 from time import sleep
 
-import link_1
+import link_2
 
-from Part1 import network_1
+import network_2
 
 ##configuration parameters
 router_queue_size = 0 #0 means unlimited
@@ -18,20 +18,20 @@ if __name__ == '__main__':
     object_L = [] #keeps track of objects, so we can kill their threads
     
     #create network nodes
-    client = network_1.Host(1)
+    client = network_2.Host(1)
     object_L.append(client)
-    server = network_1.Host(2)
+    server = network_2.Host(2)
     object_L.append(server)
-    router_a = network_1.Router(name='A', intf_count=1, max_queue_size=router_queue_size)
+    router_a = network_2.Router(name='A', intf_count=1, max_queue_size=router_queue_size)
     object_L.append(router_a)
     
     #create a Link Layer to keep track of links between network nodes
-    link_layer = link_1.LinkLayer()
+    link_layer = link_2.LinkLayer()
     object_L.append(link_layer)
     
     #add all the links
-    link_layer.add_link(link_1.Link(client, 0, router_a, 0, 50))
-    link_layer.add_link(link_1.Link(router_a, 0, server, 0, 50))
+    link_layer.add_link(link_2.Link(client, 0, router_a, 0, 50))
+    link_layer.add_link(link_2.Link(router_a, 0, server, 0, 50))
     
     
     #start all the objects

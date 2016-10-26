@@ -8,7 +8,7 @@ from time import sleep
 
 import link_1
 
-from Part1 import network_1
+import network_1
 
 ##configuration parameters
 router_queue_size = 0 #0 means unlimited
